@@ -21,17 +21,24 @@ public class deathEvent implements Listener {
             return;
         }
 
-        p.spigot().respawn();
+        if (p.getMaxHealth() <= 1) {
+            p.setGameMode(GameMode.SPECTATOR);
+            p.spigot().respawn();
+            return;
+        }
 
-        p.setMaxHealth(p.getMaxHealth() - 1);
+
+        p.spigot().respawn();
+        if (p.getMaxHealth() > 1) {
+            p.setMaxHealth(p.getMaxHealth() - 1);
+        }
         p.setHealth(p.getMaxHealth());
         killer.setMaxHealth(killer.getMaxHealth() + 1);
         killer.sendMessage("You have stolen a heart!");
         p.sendMessage("You have lost a heart!");
 
-        if (p.getMaxHealth() <= 0) {
-            p.setGameMode(GameMode.SPECTATOR);
-        }
+
+
     }
 
 }

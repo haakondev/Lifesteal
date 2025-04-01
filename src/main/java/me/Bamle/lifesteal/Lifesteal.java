@@ -1,39 +1,70 @@
 package me.Bamle.lifesteal;
 
+import me.Bamle.lifesteal.commands.LifestealReload;
 import me.Bamle.lifesteal.listeners.deathEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.ArrayList;
 
 public final class Lifesteal extends JavaPlugin {
 
+    private me.Bamle.lifesteal.database.DataBaseManager databaseManager;
+
+    ArrayList<World> worlds = new ArrayList<>();
+
     @Override
     public void onEnable() {
+        saveDefaultConfig();
+        Bukkit.getServer().getPluginManager().registerEvents(new deathEvent(), this);
+        getCommand("lifesteal").setExecutor(new LifestealReload(this));
+        setWorldBorder();
+        databaseManager = new me.Bamle.lifesteal.database.DataBaseManager(getConfig());
+        databaseManager.connect();
+        databaseManager.setupDatabase();
+
         Bukkit.getServer().getPluginManager().registerEvents(new deathEvent(), this);
         setWorldBorder();
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        if (databaseManager != null) {
+            databaseManager.disconnect();
+        }
     }
 
+
+
     public void setWorldBorder() {
-        World[] worlds = {Bukkit.getWorld("world"), Bukkit.getWorld("world_nether"), Bukkit.getWorld("world_the_end")}; // Replace with your world name if different
+        FileConfiguration config = getConfig();
+
+        config.getStringList("world-border.worlds").forEach(worldName -> {
+            World world = Bukkit.getWorld(worldName);
+            if (world != null) {
+                worlds.add(world);
+            } else {
+                getLogger().warning("World " + worldName + " not found. Please check your config.");
+            }
+        });
+
         for (World world : worlds) {
             if (world != null) {
                 setBorder(world);
             }
         }
     }
+
     public void setBorder(World world) {
-
+        FileConfiguration config = getConfig();
         WorldBorder border = world.getWorldBorder();
-        border.setCenter(0, 0); // Set border center at (0,0)
-        border.setSize(1000); // 1000x1000 area
-        border.setDamageAmount(1.0); // Damage per second when outside
-        border.setWarningDistance(5); // Warn players when 5 blocks away from border
-    }
 
+        border.setCenter(config.getDouble("world-border.center-x"), config.getDouble("world-border.center-z"));
+        border.setSize(config.getDouble("world-border.size"));
+        border.setDamageAmount(config.getDouble("world-border.damage-amount"));
+        border.setWarningDistance(config.getInt("world-border.warning-distance"));
+    }
 }

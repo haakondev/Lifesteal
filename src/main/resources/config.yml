@@ -1,0 +1,17 @@
+world-border:
+  center-x: 0
+  center-z: 0
+  size: 1000
+  damage-amount: 1.0
+  warning-distance: 5
+  worlds:
+    - "world"
+    - "world_nether"
+    - "world_the_end"
+
+database:
+  host: "localhost"
+  port: 3306
+  database: "Lifesteal"
+  username: "root"
+  password: "root"
