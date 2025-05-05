@@ -1,6 +1,7 @@
 package me.Bamle.lifesteal;
 
 import me.Bamle.lifesteal.commands.LifestealReload;
+import me.Bamle.lifesteal.dataBase.DataBaseManager;
 import me.Bamle.lifesteal.listeners.deathEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 
 public final class Lifesteal extends JavaPlugin {
 
-    private me.Bamle.lifesteal.database.DataBaseManager databaseManager;
+    private DataBaseManager databaseManager;
 
     ArrayList<World> worlds = new ArrayList<>();
 
@@ -22,7 +23,7 @@ public final class Lifesteal extends JavaPlugin {
         Bukkit.getServer().getPluginManager().registerEvents(new deathEvent(), this);
         getCommand("lifesteal").setExecutor(new LifestealReload(this));
         setWorldBorder();
-        databaseManager = new me.Bamle.lifesteal.database.DataBaseManager(getConfig());
+        databaseManager = new DataBaseManager(getConfig());
         databaseManager.connect();
         databaseManager.setupDatabase();
 
